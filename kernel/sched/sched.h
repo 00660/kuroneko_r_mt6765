@@ -2921,7 +2921,9 @@ static inline bool task_placement_boost_enabled(struct task_struct *p)
 	return false;
 }
 
+#ifndef CONFIG_MTK_SCHED_BIG_TASK_MIGRATE
 static inline void check_for_migration(struct rq *rq, struct task_struct *p) { }
+#endif
 
 static inline int sched_boost(void)
 {
@@ -2950,8 +2952,10 @@ task_in_cum_window_demand(struct rq *rq, struct task_struct *p)
 }
 
 static inline bool hmp_capable(void) { return false; }
+#ifndef CONFIG_MTK_SCHED_BIG_TASK_MIGRATE
 static inline bool is_max_capacity_cpu(int cpu) { return true; }
 static inline bool is_min_capacity_cpu(int cpu) { return true; }
+#endif
 
 static inline int
 preferred_cluster(struct sched_cluster *cluster, struct task_struct *p)
@@ -3020,10 +3024,12 @@ static inline unsigned long thermal_cap(int cpu)
 
 static inline void clear_walt_request(int cpu) { }
 
+#ifndef CONFIG_MTK_SCHED_BIG_TASK_MIGRATE
 static inline int is_reserved(int cpu)
 {
 	return 0;
 }
+#endif
 
 static inline enum sched_boost_policy sched_boost_policy(void)
 {
