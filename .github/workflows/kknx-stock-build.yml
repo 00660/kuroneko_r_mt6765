@@ -22,12 +22,32 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends \
             bc bison build-essential ca-certificates curl flex git \
-            libelf-dev libssl-dev python3 wget xz-utils zstd
+            libelf-dev libssl-dev python3 wget xz-utils zstd \
+            gcc-aarch64-linux-gnu gcc-arm-linux-gnueabihf
+
+      - name: Prepare KKNX toolchains with apt GCC
+        run: |
+          set -euxo pipefail
+          mkdir -p clang
+          cd clang
+          bash <(curl -fsSL https://raw.githubusercontent.com/Neutron-Toolchains/antman/main/antman) -S=11032023
+          cd ..
+
+          mkdir -p gcc-linaro-13.0.0-2022.10-x86_64_aarch64-linux-gnu/bin
+          for tool in gcc ld as ar nm objcopy objdump strip; do
+            ln -sf "$(command -v aarch64-linux-gnu-${tool})" \
+              "gcc-linaro-13.0.0-2022.10-x86_64_aarch64-linux-gnu/bin/aarch64-linux-gnu-${tool}"
+          done
+
+          mkdir -p gcc-linaro-13.0.0-2022.10-x86_64_arm-linux-gnueabihf/bin
+          for tool in gcc ld as ar nm objcopy objdump strip elfedit; do
+            ln -sf "$(command -v arm-linux-gnueabihf-${tool})" \
+              "gcc-linaro-13.0.0-2022.10-x86_64_arm-linux-gnueabihf/bin/arm-linux-gnueabihf-${tool}"
+          done
 
       - name: Run KKNX stock build commands
         run: |
-          chmod +x prepare_compiler.sh clang.sh
-          ./prepare_compiler.sh
+          chmod +x clang.sh
           ./clang.sh blossom_stock_defconfig
           ./clang.sh Image.gz
 
